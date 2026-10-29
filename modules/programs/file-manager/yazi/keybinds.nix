@@ -1,6 +1,10 @@
 {
-          mgr.prepend_keymap = [
-            # recycle-bin plugin
+  mgr.prepend_keymap = [
+{
+  on = [ "b" ];
+  run = "plugin extract";
+  desc = "Extract hovered archive";
+}             # recycle-bin plugin
             {
               on = [
                 "R"

@@ -17,6 +17,7 @@ in
 
 
         plugins = {
+          extract = ./plugins/extract.yazi;
           compress = pkgs.yaziPlugins.compress; # Compressing tool
           chmod = pkgs.yaziPlugins.chmod; # Permissions tool
           recycle-bin = pkgs.yaziPlugins.recycle-bin; # trash-cli integration

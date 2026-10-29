@@ -26,7 +26,9 @@
 	  ./programs/terminal/alacritty
 	  ./programs/terminal/kitty
 
-	  ./programs/file-manager/yazi
+    ./programs/file-manager/yazi
+    ./programs/file-manager/lf
+
 	  # ./programs/misc/cpufreq # Disable power-profiles
 	  ./programs/misc/lact
 	  ./programs/misc/tlp

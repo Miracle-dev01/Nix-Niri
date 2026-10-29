@@ -16,9 +16,9 @@ pkgs.writeShellScriptBin "ex" ''
              *.bz2)       bunzip2 ./"$n"     ;;
              *.cbr|*.rar)
                  if [ -n "$EX_PASSWORD" ]; then
-                     ${pkgs.unrar}/bin/unrar x -ad -p"$EX_PASSWORD" ./"$n"
+                     ${pkgs.unrar}/bin/unrar x -ad -p"$EX_PASSWORD" "$n"
                  else
-                     ${pkgs.unrar}/bin/unrar x -ad ./"$n"
+                     ${pkgs.unrar}/bin/unrar x -ad "$n"
                  fi ;;
              *.gz)        gunzip ./"$n"      ;;
              *.cbz|*.epub|*.zip)
