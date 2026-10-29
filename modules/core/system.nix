@@ -1,0 +1,119 @@
+{
+  lib,
+  self,
+  inputs,
+  host,
+  pkgs,
+  ...
+}:
+
+let 
+  capslockAsESC = false;
+in
+{
+  imports = [ inputs.nix-index-database.nixosModules.nix-index ];
+  programs = {
+    nix-index-database.comma.enable = true;
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
+  };
+  services.xserver = {
+    enable = true;
+    excludePackages = with pkgs; [ xterm ];
+    exportConfiguration = true; # Make sure /etc/X11/xkb is populated so localectl works correctly
+    xkb = {
+      layout = "us";
+      variant = "";
+      options = "caps:swapescape";
+    };
+  };
+  nix = {
+    # Nix Package Manager Settings
+    settings = {
+      trusted-users = [
+        "root"
+        "@wheel"
+      ]; # Required by Cachix to be used as non-root user
+      accept-flake-config = true;
+      builders-use-substitutes = true;
+      download-buffer-size = 200000000;
+      auto-optimise-store = true; # May make rebuilds longer but less size
+      substituters = [
+        "https://cache.nixos.org/"
+        "https://nix-community.cachix.org/"
+        "https://hyprland.cachix.org/"
+        "https://noctalia.cachix.org"
+        # "https://nix-gaming.cachix.org"
+        # "https://chaotic-nyx.cachix.org"
+        # "https://devenv.cachix.org"
+      ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+        "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+        # "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
+        # "chaotic-nyx.cachix.org-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
+        # "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      use-xdg-base-directories = false;
+      warn-dirty = false;
+      keep-outputs = true;
+      keep-derivations = true;
+    };
+    optimise.automatic = true;
+    package = pkgs.nix;
+  };
+  time.timeZone = "Asia/Kathmandu";
+  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
+  };
+  environment.variables = {
+    templates = "${self}/dev-shells";
+    NIXOS_OZONE_WL = "1";
+
+    # These are the defaults, and xdg.enable does set them, but due to load
+    # order, they're not set before environment.variables are set, which could
+    # cause race conditions.
+    XDG_CACHE_HOME = "$HOME/.cache";
+    XDG_CONFIG_HOME = "$HOME/.config";
+    XDG_DATA_HOME = "$HOME/.local/share";
+    XDG_BIN_HOME = "$HOME/.local/bin";
+  };
+
+  console.keyMap = "us";
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      # allowUnfreePredicate = _: true;
+    };
+  };
+  system.stateVersion = "26.05"; # Do not change!
+}
+
+// lib.optionalAttrs capslockAsESC {
+  services.udev.extraHwdb = ''
+    evdev:atkbd:*
+      KEYBOARD_KEY_3a=esc
+      KEYBOARD_KEY_01=capslock
+
+    evdev:input:b*v*p*e*:
+      KEYBOARD_KEY_3a=esc
+      KEYBOARD_KEY_01=capslock
+  '';
+}

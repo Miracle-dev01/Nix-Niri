@@ -1,0 +1,59 @@
+{ pkgs, ... }:
+
+{
+
+   catppuccin = {
+    autoEnable = true;
+    enable = true;
+    grub = {
+      enable = true;
+      flavor = "mocha";
+    };
+  };
+
+  boot.loader = {
+    systemd-boot.enable = false;
+    efi.canTouchEfiVariables = true;
+    timeout = 5;
+
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      configurationLimit = 15;
+      default = "0";
+      timeoutStyle = "menu";
+
+      # Explicitly set your monitor resolution
+      gfxmodeEfi = "1920x1080";
+      gfxpayloadEfi = "keep";
+
+      # Catppuccin theme configuration (only 'flavor' is supported)
+      
+
+
+
+      # Load graphics driver modules to stop flickering and glitches
+      extraConfig = ''
+        insmod efi_gop
+        insmod efi_uga
+        insmod ieee1275_fb
+        insmod vbe
+        insmod vga
+        insmod video_bochs
+        insmod video_cirrus
+        insmod font
+        insmod gfxterm
+      '';
+
+
+
+      extraInstallCommands = ''
+        ${pkgs.gnused}/bin/sed -i \
+          -e 's/menuentry "NixOS"/menuentry "Enter NixOS"/' \
+          -e 's/submenu "NixOS - All configurations"/submenu "NixOS generations"/' \
+          /boot/grub/grub.cfg
+      '';
+    };
+  };
+}
